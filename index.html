@@ -2,225 +2,124 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Drag the Words</title>
 
 <style>
 
 body{
-font-family:Arial, Helvetica, sans-serif;
+font-family: Arial, Helvetica, sans-serif;
 background:#0E1D2E;
-color:#F4F4F4;
+color:white;
 padding:40px;
-font-size:24px;
+font-size:22px;
 }
 
 h2{
 margin-bottom:30px;
 }
 
-/* WORD BANK */
-
 .wordbank{
-margin-bottom:60px;
+margin-bottom:50px;
 }
 
 .word{
 display:inline-block;
 background:#ff6400;
-padding:14px 30px;
-border-radius:10px;
-margin:10px;
+padding:12px 25px;
+margin:8px;
+border-radius:8px;
 cursor:grab;
 font-weight:bold;
-user-select:none;
 }
-
-/* SENTENCES */
-
-.sentence{
-margin:35px 0;
-line-height:1.8;
-}
-
-/* DROP AREA */
 
 .dropzone{
-display:inline-flex;
-align-items:center;
-justify-content:center;
-
-min-width:240px;
-height:60px;
-
-border-bottom:6px solid #ff3b3b;
-
+display:inline-block;
+min-width:200px;
+border-bottom:4px solid red;
 margin:0 10px;
-
-font-weight:bold;
-font-size:22px;
 }
 
 .correct{
-border-bottom:6px solid #00e676;
+border-bottom:4px solid #00e676;
 color:#00e676;
 }
 
+.sentence{
+margin:25px 0;
+}
+
 </style>
+
 </head>
 
 <body>
 
-<h2>Drag the correct word into each sentence</h2>
+<h2>Drag the correct word into the sentence</h2>
 
-<div class="wordbank" id="wordbank"></div>
+<div class="wordbank">
 
-<div id="sentences"></div>
+<div class="word" draggable="true">challenges</div>
+<div class="word" draggable="true">grow</div>
+<div class="word" draggable="true">annoy</div>
+<div class="word" draggable="true">fate</div>
+<div class="word" draggable="true">grew up</div>
+
+</div>
+
+<div class="sentence">
+Loud music at night can 
+<span class="dropzone" data-answer="annoy"></span>
+the neighbors.
+</div>
+
+<div class="sentence">
+Plants 
+<span class="dropzone" data-answer="grow"></span>
+faster when they get sunlight.
+</div>
+
+<div class="sentence">
+She 
+<span class="dropzone" data-answer="grew up"></span>
+in a small town.
+</div>
+
+<div class="sentence">
+Learning English has many 
+<span class="dropzone" data-answer="challenges"></span>.
+</div>
+
+<div class="sentence">
+Some people believe 
+<span class="dropzone" data-answer="fate"></span>
+decides our future.
+</div>
 
 <script>
 
-/* DATA */
+let draggedWord = null
 
-let words = [
-"annoy",
-"grow",
-"grew up",
-"challenges",
-"fate"
-]
+document.querySelectorAll(".word").forEach(word => {
 
-let sentences = [
-
-{
-text:"Loud music at night can ___ the neighbors.",
-answer:"annoy"
-},
-
-{
-text:"Plants ___ faster when they get enough sunlight.",
-answer:"grow"
-},
-
-{
-text:"She ___ in a small town.",
-answer:"grew up"
-},
-
-{
-text:"Learning a new language has many ___, but it is rewarding.",
-answer:"challenges"
-},
-
-{
-text:"Some people believe ___ decides who we meet in life.",
-answer:"fate"
-}
-
-]
-
-/* SHUFFLE FUNCTION */
-
-function shuffle(array){
-
-for(let i=array.length-1;i>0;i--){
-
-const j=Math.floor(Math.random()*(i+1))
-
-[array[i],array[j]]=[array[j],array[i]]
-
-}
-
-}
-
-/* RANDOMIZE */
-
-shuffle(words)
-shuffle(sentences)
-
-/* CREATE WORD BANK */
-
-const bank=document.getElementById("wordbank")
-
-words.forEach(word=>{
-
-const div=document.createElement("div")
-
-div.className="word"
-div.draggable=true
-
-div.dataset.word=word
-
-div.innerText=word
-
-bank.appendChild(div)
-
-})
-
-/* CREATE SENTENCES */
-
-const container=document.getElementById("sentences")
-
-sentences.forEach(s=>{
-
-const div=document.createElement("div")
-
-div.className="sentence"
-
-const parts=s.text.split("___")
-
-div.innerHTML=`
-
-${parts[0]}
-
-<span class="dropzone" data-answer="${s.answer}"></span>
-
-${parts[1]}
-
-`
-
-container.appendChild(div)
-
-})
-
-/* DRAG SYSTEM */
-
-const wordsDrag=document.querySelectorAll(".word")
-const zones=document.querySelectorAll(".dropzone")
-
-wordsDrag.forEach(word=>{
-
-word.addEventListener("dragstart",e=>{
-
-e.dataTransfer.setData("text",word.dataset.word)
-
+word.addEventListener("dragstart", function(){
+draggedWord = this
 })
 
 })
 
-zones.forEach(zone=>{
+document.querySelectorAll(".dropzone").forEach(zone => {
 
-zone.addEventListener("dragover",e=>{
-
+zone.addEventListener("dragover", function(e){
 e.preventDefault()
-
 })
 
-zone.addEventListener("drop",e=>{
+zone.addEventListener("drop", function(){
 
-e.preventDefault()
+if(draggedWord.innerText === this.dataset.answer){
 
-const word=e.dataTransfer.getData("text")
-
-if(word===zone.dataset.answer){
-
-zone.textContent=word
-zone.classList.add("correct")
-
-document.querySelectorAll(".word").forEach(w=>{
-if(w.dataset.word===word){
-w.style.display="none"
-}
-})
+this.innerText = draggedWord.innerText
+this.classList.add("correct")
+draggedWord.style.display = "none"
 
 }
 
