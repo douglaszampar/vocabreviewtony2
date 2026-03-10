@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Drag the Words</title>
 
 <style>
@@ -16,10 +15,14 @@ padding:40px;
 font-size:24px;
 }
 
+h2{
+margin-bottom:30px;
+}
+
 /* WORD BANK */
 
 .wordbank{
-margin-bottom:50px;
+margin-bottom:60px;
 }
 
 .word{
@@ -30,36 +33,42 @@ border-radius:10px;
 margin:10px;
 cursor:grab;
 font-weight:bold;
+user-select:none;
 }
 
 /* SENTENCES */
 
 .sentence{
-margin:30px 0;
+margin:35px 0;
 line-height:1.8;
 }
 
-/* DROP AREA (same style as previous activity) */
+/* DROP AREA */
 
 .dropzone{
 display:inline-flex;
 align-items:center;
 justify-content:center;
-min-width:220px;
-height:50px;
-border-bottom:5px solid #ff3b3b;
-margin:0 8px;
+
+min-width:240px;
+height:60px;
+
+border-bottom:6px solid #ff3b3b;
+
+margin:0 10px;
+
 font-weight:bold;
 font-size:22px;
 }
 
 .correct{
-border-bottom:5px solid #00e676;
+border-bottom:6px solid #00e676;
 color:#00e676;
 }
 
 </style>
 </head>
+
 <body>
 
 <h2>Drag the correct word into each sentence</h2>
@@ -81,35 +90,46 @@ let words = [
 ]
 
 let sentences = [
+
 {
 text:"Loud music at night can ___ the neighbors.",
 answer:"annoy"
 },
+
 {
 text:"Plants ___ faster when they get enough sunlight.",
 answer:"grow"
 },
+
 {
 text:"She ___ in a small town.",
-answer:"grewup"
+answer:"grew up"
 },
+
 {
 text:"Learning a new language has many ___, but it is rewarding.",
 answer:"challenges"
 },
+
 {
 text:"Some people believe ___ decides who we meet in life.",
 answer:"fate"
 }
+
 ]
 
 /* SHUFFLE FUNCTION */
 
 function shuffle(array){
+
 for(let i=array.length-1;i>0;i--){
+
 const j=Math.floor(Math.random()*(i+1))
+
 [array[i],array[j]]=[array[j],array[i]]
+
 }
+
 }
 
 /* RANDOMIZE */
@@ -127,7 +147,8 @@ const div=document.createElement("div")
 
 div.className="word"
 div.draggable=true
-div.id=word.replace(" ","")
+
+div.dataset.word=word
 
 div.innerText=word
 
@@ -148,9 +169,13 @@ div.className="sentence"
 const parts=s.text.split("___")
 
 div.innerHTML=`
+
 ${parts[0]}
+
 <span class="dropzone" data-answer="${s.answer}"></span>
+
 ${parts[1]}
+
 `
 
 container.appendChild(div)
@@ -159,13 +184,15 @@ container.appendChild(div)
 
 /* DRAG SYSTEM */
 
-const draggableWords=document.querySelectorAll(".word")
+const wordsDrag=document.querySelectorAll(".word")
 const zones=document.querySelectorAll(".dropzone")
 
-draggableWords.forEach(word=>{
+wordsDrag.forEach(word=>{
 
 word.addEventListener("dragstart",e=>{
-e.dataTransfer.setData("text",word.id)
+
+e.dataTransfer.setData("text",word.dataset.word)
+
 })
 
 })
@@ -173,23 +200,27 @@ e.dataTransfer.setData("text",word.id)
 zones.forEach(zone=>{
 
 zone.addEventListener("dragover",e=>{
+
 e.preventDefault()
+
 })
 
 zone.addEventListener("drop",e=>{
 
 e.preventDefault()
 
-const id=e.dataTransfer.getData("text")
+const word=e.dataTransfer.getData("text")
 
-if(id===zone.dataset.answer){
+if(word===zone.dataset.answer){
 
-const word=document.getElementById(id)
-
-zone.textContent=word.textContent
+zone.textContent=word
 zone.classList.add("correct")
 
-word.style.display="none"
+document.querySelectorAll(".word").forEach(w=>{
+if(w.dataset.word===word){
+w.style.display="none"
+}
+})
 
 }
 
